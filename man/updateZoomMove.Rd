@@ -4,23 +4,36 @@
 \alias{updateZoomMove}
 \title{Update zoomMove}
 \usage{
-updateZoomMove(NGLVieweR_proxy, center, zoom, duration = 0, z_offSet = 0)
+updateZoomMove(
+  NGLVieweR_proxy,
+  center,
+  zoom,
+  duration = 0,
+  z_offSet = 0,
+  structureIndex = NULL
+)
 }
 \arguments{
 \item{NGLVieweR_proxy}{A NGLVieweR object.}
 
-\item{center}{Target distance of selected atoms/residues.
-See the section "selection-language" in the official \href{http://nglviewer.org/ngl/api/}{NGL.js} manual.}
+\item{center}{Target distance of selected atoms/residues. See the section
+"selection-language" in the official
+\href{http://nglviewer.org/ngl/api/}{NGL.js} manual.}
 
-\item{zoom}{Target zoom of selected atoms/residues.
-See the section "selection-language" in the official \href{http://nglviewer.org/ngl/api/}{NGL.js} manual.}
+\item{zoom}{Target zoom of selected atoms/residues. See the section
+"selection-language" in the official
+\href{http://nglviewer.org/ngl/api/}{NGL.js} manual.}
 
 \item{duration}{Optional animation time in milliseconds (default = 0).}
 
 \item{z_offSet}{Optional zoom offset value (default = 0).}
+
+\item{structureIndex}{Optional index of the structure to target for the zoom
+animation. If \code{NULL} (default), the first structure (index 0) is targeted.}
 }
 \value{
-API call containing \code{NGLVieweR} \code{id} and list of message parameters.
+API call containing \code{NGLVieweR} \code{id} and list of message
+parameters.
 }
 \description{
 Add a zoom animation on an existing NGLVieweR object.
@@ -94,7 +107,6 @@ Other animations:
 \code{\link{setRock}()},
 \code{\link{setSpin}()},
 \code{\link{updateRock}()},
-\code{\link{updateSpin}()},
-\code{\link{zoomMove}()}
+\code{\link{updateSpin}()}
 }
 \concept{animations}

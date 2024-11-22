@@ -1,9 +1,12 @@
-# **NGLVieweR** - <img src="man/figures/logo.png" class="logo" align="right" height="150px"/> Visualize and interact with Protein Data Bank (PDB) and structural files in R and Shiny
-
+<p align="center">
+  <img src="man/figures/logo.png" height="150px" width="150px" align="right" alt="NGLVieweR Logo">
+  <h1><strong>NGLVieweR</strong> - Visualize and interact with Protein Data Bank (PDB) and structural files in R and Shiny</h1>
+</p>
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/nvelden/NGLVieweR/workflows/R-CMD-check/badge.svg)](https://github.com/nvelden/NGLVieweR/actions) [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental) [![CRAN status](https://www.r-pkg.org/badges/version/NGLVieweR)](https://CRAN.R-project.org/package=NGLVieweR)
-
+[![R-CMD-check](https://github.com/nvelden/NGLVieweR/workflows/R-CMD-check/badge.svg)](https://github.com/nvelden/NGLVieweR/actions) [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental) 
+[![CRAN status](https://www.r-pkg.org/badges/version/NGLVieweR)](https://CRAN.R-project.org/package=NGLVieweR)
+[![Metacran downloads](https://cranlogs.r-pkg.org/badges/grand-total/NGLVieweR)](https://cran.r-project.org/package=NGLVieweR)
 <!-- badges: end -->
 
 ### [Click here](https://niels-van-der-velden.shinyapps.io/shinyNGLVieweR/) to view a Shiny application integrating most features of **NGLVieweR**.
@@ -14,7 +17,13 @@
 
 ## Installation
 
-**NGLVieweR** is available through GitHub
+You can install the released version of **NGLVieweR** from [CRAN](https://CRAN.R-project.org) with:
+
+``` r
+install.packages("NGLVieweR")
+```
+
+And the development version from [GitHub](https://github.com/) with:
 
 ``` {.r}
 install.packages("remotes")
@@ -35,7 +44,7 @@ NGLVieweR("7CID") %>%
 addRepresentation("cartoon")
 ```
 
-<img src="man/figures/cartoon_representation.PNG" class="screenshot" width="50%"/>
+<img src="man/figures/cartoon_representation.PNG" class="screenshot" width="50%" alt="Cartoon representation example in NGLVieweR"/>
 
 ## Functionality
 

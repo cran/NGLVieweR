@@ -12,7 +12,8 @@ setRock(NGLVieweR, rock = TRUE)
 \item{rock}{If \code{TRUE} (default), start rocking and stop spinning.}
 }
 \value{
-setRock parameter to \code{TRUE} or \code{FALSE} in \code{NGLVieweR} \code{htmlwidgets} object.
+setRock parameter to \code{TRUE} or \code{FALSE} in \code{NGLVieweR}
+\code{htmlwidgets} object.
 }
 \description{
 Set rock animation
@@ -32,7 +33,6 @@ Other animations:
 \code{\link{setSpin}()},
 \code{\link{updateRock}()},
 \code{\link{updateSpin}()},
-\code{\link{updateZoomMove}()},
-\code{\link{zoomMove}()}
+\code{\link{updateZoomMove}()}
 }
 \concept{animations}

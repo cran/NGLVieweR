@@ -9,18 +9,21 @@ zoomMove(NGLVieweR, center, zoom, duration = 0, z_offSet = 0)
 \arguments{
 \item{NGLVieweR}{A NGLVieweR object.}
 
-\item{center}{Target distance of selected atoms/residues.
-See the section "selection-language" in the official \href{https://nglviewer.org/}{NGL.js} manual.}
+\item{center}{Target distance of selected atoms/residues. See the section
+"selection-language" in the official \href{https://nglviewer.org/}{NGL.js}
+manual.}
 
-\item{zoom}{Target zoom of selected atoms/residues.
-See the section "selection-language" in the official \href{https://nglviewer.org/}{NGL.js} manual.}
+\item{zoom}{Target zoom of selected atoms/residues. See the section
+"selection-language" in the official \href{https://nglviewer.org/}{NGL.js}
+manual.}
 
 \item{duration}{Optional animation time in milliseconds (default = 0).}
 
 \item{z_offSet}{Optional zoom offset value (default = 0).}
 }
 \value{
-List of zoomMove parameters to \code{NGLVieweR} \code{htmlwidgets} object.
+List of zoomMove parameters to \code{NGLVieweR} \code{htmlwidgets}
+object.
 }
 \description{
 Add a zoom animation
@@ -28,19 +31,23 @@ Add a zoom animation
 \examples{
 NGLVieweR("7CID") \%>\%
 stageParameters(backgroundColor = "white") \%>\%
- addRepresentation("cartoon", param=list(name="cartoon", colorValue="red")) \%>\%
- addRepresentation("ball+stick", param=list(name="ball+stick",
-                                            colorValue="yellow",
-                                            colorScheme="element",
-                                            sele="200")) \%>\%
- zoomMove("200:A.C", "200:A.C", 2000, -20)
+  addRepresentation("cartoon", param=list(name="cartoon", colorValue="red")) \%>\%
+  addRepresentation("ball+stick", param=list(name="ball+stick",
+                                             colorValue="yellow",
+                                             colorScheme="element",
+                                             sele="200")) \%>\%
+  zoomMove("200:A.C", "200:A.C", 2000, -20)
 }
 \seealso{
-Other animations: 
-\code{\link{setRock}()},
-\code{\link{setSpin}()},
-\code{\link{updateRock}()},
-\code{\link{updateSpin}()},
-\code{\link{updateZoomMove}()}
+\itemize{
+\item \code{\link[=setScale]{setScale()}}
+\item \code{\link[=setRotation]{setRotation()}}
+\item \code{\link[=setPosition]{setPosition()}}
 }
-\concept{animations}
+
+Other transformations: 
+\code{\link{setPosition}()},
+\code{\link{setRotation}()},
+\code{\link{setScale}()}
+}
+\concept{transformations}

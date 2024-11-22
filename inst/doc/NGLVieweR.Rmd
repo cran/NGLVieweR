@@ -103,7 +103,7 @@ addRepresentation("ball+stick")
 
 You can alter the appearance of select residues using the `param` argument. For a full list of options see the [NGL.js](http://nglviewer.org/ngl/api/) "RepresentationParameters" and the "Selection language" section.
 
-```{r representations, screenshot.force=FALSE}
+```{r structures, screenshot.force=FALSE}
 NGLVieweR("7CID") %>%
   addRepresentation("cartoon",
     param = list(colorScheme = "residueindex")
@@ -122,6 +122,40 @@ NGLVieweR("7CID") %>%
     )
   )
 ```
+
+## Structures
+
+Using `addStructure()`, you can load multiple structures into the same stage. In this example, the first structure is represented in blue, while the second 
+representation of the structure is represented in orange. Transformations such as `setPosition()`, `setRotation()`, and `setScale()` apply to the second 
+(most recently added) structure.
+
+```{r representations, screenshot.force=FALSE}
+NGLVieweR("1CRN") %>%
+  addRepresentation("cartoon", param = list(color = "blue")) %>%
+  addStructure("1CRN") %>%
+  addRepresentation("cartoon", param = list(color = "orange")) %>%
+  setPosition(x = 20, y = 0, z = 0) %>%
+  setRotation(x = 2, y = 0, z = 0, degrees = FALSE) %>% 
+  setScale(0.5)
+```
+
+## Superpose
+
+Structures can be superposed onto each other using the `setSuperpose()` function. It aligns the structures by specifying a reference structure (defaulting to the first one loaded) and defining the selections within each structure to be used for alignment.
+
+```{r superpose, screenshot.force=FALSE}
+NGLVieweR("1GZM") %>%
+   addRepresentation("cartoon", param = list(color = "blue")) %>%
+   addStructure("1U19") %>%
+   addRepresentation("cartoon", param = list(color = "orange")) %>%
+   setSuperpose(
+     reference = 1, 
+     sele_reference = ":A", 
+     sele_target = ":A", 
+     superpose = TRUE
+     )
+```
+
 
 ## Stage
 
@@ -173,6 +207,40 @@ NGLVieweR("7CID") %>%
       # backgroundOpacity=0.5
     )
   )
+```
+
+## Transformation functions
+
+The package provides a set of transformation functions that allow for adjusting the scale, rotation, and position of the visualized structures.
+
+### Scaling Structures
+
+The `setScale()` function allows you to adjust the scale of the visualized structure:
+
+```
+NGLVieweR("7CID") %>%
+addRepresentation("cartoon") %>%
+setScale(2) # Doubles the size of the structure
+```
+
+### Rotating Structures
+
+You can rotate the visualized structures using the `setRotation()` function:
+
+```
+NGLVieweR("7CID") %>%
+addRepresentation("cartoon") %>%
+setRotation(30, 45, 60) # Rotates the structure 30 degrees around x-axis, 45 degrees around y-axis and 60 degrees around z-axis.
+```
+
+### Positioning Structures
+
+The `setPosition()` function allows you to change the position of the visualized structure:
+
+```
+NGLVieweR("7CID") %>%
+addRepresentation("cartoon") %>%
+setPosition(25, 0, 0) # Moves the structure 25 units along the x-axis.
 ```
 
 ## Zoom
@@ -313,7 +381,7 @@ server <- function(input, output) {
 shinyApp(ui, server)
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.cap="A basic NGLVieweR Shiny app"}
 knitr::include_graphics("../man/figures/basic_shiny.PNG")
 ```
 
@@ -324,6 +392,7 @@ In Shiny apps, you can manipulate the **NGLVieweR** widget after creation using 
 ```{r eval=FALSE}
 library(shiny)
 library(NGLVieweR)
+
 ui <- fluidPage(
   titlePanel("Viewer with API inputs"),
   sidebarLayout(
@@ -339,37 +408,53 @@ ui <- fluidPage(
     )
   )
 )
+
 server <- function(input, output) {
   output$structure <- renderNGLVieweR({
     NGLVieweR("7CID") %>%
       addRepresentation("cartoon",
-        param = list(name = "cartoon", colorScheme = "residueindex")
+                        param = list(name = "cartoon", colorScheme = "residueindex")
       ) %>%
       stageParameters(backgroundColor = input$backgroundColor) %>%
       setQuality("high") %>%
       setFocus(0) %>%
       setSpin(TRUE)
   })
+  
   observeEvent(input$add, {
-    NGLVieweR_proxy("structure") %>%
-      addSelection(isolate(input$type),
-        param =
-          list(
-            name = "sel1",
-            sele = isolate(input$selection),
-            colorValue = isolate(input$color)
-          )
-      )
+    if (isolate(input$type) == "cartoon") {
+      # For cartoon, use the color parameter
+      NGLVieweR_proxy("structure") %>%
+        addSelection(isolate(input$type),
+                     param = list(
+                       name = "sel1",
+                       sele = isolate(input$selection),
+                       color = isolate(input$color)
+                     )
+        )
+    } else {
+      # For other types, use colorValue
+      NGLVieweR_proxy("structure") %>%
+        addSelection(isolate(input$type),
+                     param = list(
+                       name = "sel1",
+                       sele = isolate(input$selection),
+                       colorValue = isolate(input$color)
+                     )
+        )
+    }
   })
+  
   observeEvent(input$remove, {
     NGLVieweR_proxy("structure") %>%
       removeSelection("sel1")
   })
 }
+
 shinyApp(ui, server)
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.cap="NGLVieweR API in Shiny"}
 knitr::include_graphics("../man/figures/API_shiny.PNG")
 ```
 
@@ -399,3 +484,139 @@ In a Shiny application one can retrieve information from the widget as inputs ba
 -   input\$structure_chainname - will return the chainname of each amino acid as a character vector,
 -   input\$structure_rendering - will return `TRUE` if the widget is loading or `FALSE` when completed.
 -   input\$structure_PDB - will return the PDB file as a text string.
+-   input\$structure_selAround - will return a list of atoms surrounding a clicked residue.
+
+In the below example a label, all contacts and residues in proximity of the clicked residue are displayed.
+
+```{r eval=FALSE}
+library(shiny)
+library(NGLVieweR)
+library(stringr)
+
+ui <- fluidPage(
+  titlePanel("Viewer with click interaction"),
+  sidebarLayout(
+    sidebarPanel(verbatimTextOutput('selection')),
+    mainPanel(NGLVieweROutput("structure"))
+  )
+)
+
+server <- function(input, output) {
+  output$structure <- renderNGLVieweR({
+    NGLVieweR("3RY2") %>%
+      addRepresentation("cartoon") %>%
+      addRepresentation(
+        "ball+stick",
+        param = list(
+          name = "biotin",
+          colorvalue = "grey",
+          colorScheme = "element",
+          sele = "5001"
+        )
+      ) %>%
+      zoomMove(center = "27:B",
+               zoom = "27:B",
+               z_offSet = -20) %>%
+      selectionParameters(3, "residue") #"atom"
+  })
+  
+  #Save click selections
+  sele <- reactiveValues()
+  
+  observe({
+    sele$aa <-
+      str_extract(input$structure_selection, "(?<=[\\[])(.*?)(?=\\])")
+    sele$aa_bond <-
+      str_extract(input$structure_selection, "(?<=[\\]])(.*?)(?=[:space:])")
+    sele$resiChain <-
+      str_extract(input$structure_selection, "(?<=[]])(.*?)(?=[.])")
+    sele$resi <-
+      str_extract(input$structure_selection, "(?<=[]])(.*?)(?=[:])")
+    sele$fileName <-
+      str_extract(input$structure_selection, "(?<=[(])(.*?)(?=[.])")
+  })
+  
+  output$selection = renderPrint({
+    #Full selection
+    print(input$structure_selection)
+    #Amino Acid
+    print(sele$aa)
+    #Bond
+    print(sele$aa_bond)
+    #Residue number + ChainNAme
+    print(sele$resiChain)
+    #Residue number
+    print(sele$resi)
+    #PDB name
+    print(sele$fileName)
+    #SelAround
+    print(input$structure_selAround)
+  })
+  
+  observeEvent(input$structure_selAround, {
+    NGLVieweR_proxy("structure") %>% removeSelection("selAround")
+    
+    NGLVieweR_proxy("structure") %>%
+      addSelection(
+        "ball+stick",
+        param =
+          list(
+            name = "selAround",
+            sele = input$structure_selAround,
+            colorValue = "grey"
+          )
+      )
+    
+  })
+  
+  observeEvent(sele$resiChain, {
+    #Remove any selections
+    NGLVieweR_proxy("structure") %>% removeSelection("label")
+    NGLVieweR_proxy("structure") %>% removeSelection("contact")
+    
+    #Add label and contacts
+    NGLVieweR_proxy("structure") %>%
+      
+      addSelection(
+        "label",
+        param = list(
+          name = "label",
+          sele = sele$resiChain,
+          labelType = "format",
+          labelFormat = "[%(resname)s]%(resno)s",
+          # or enter custom text
+          labelGrouping = "residue",
+          # or "atom" (eg. sele = "20:A.CB")
+          color = "white",
+          xOffset = 1,
+          fixedSize = TRUE,
+          radiusType = 1,
+          radiusSize = 1.5
+        )
+      ) %>%
+      addSelection(
+        "contact",
+        param = list(
+          name = "contact",
+          sele = "*",
+          #Select all residues
+          filterSele =
+            list(sele$resiChain, # Show bonds between selected residue
+                 "*"),
+          # and all other residues
+          labelVisible = TRUE,
+          labelFixedSize = FALSE,
+          labelUnit = "angstrom",
+          # "", "angstrom", "nm"
+          labelSize = 2
+        )
+      )
+  })
+  
+}
+shinyApp(ui, server)
+```
+
+```{r, echo=FALSE, fig.cap="Click interaction example in NGLVieweR"}
+knitr::include_graphics("../man/figures/click_interaction.PNG")
+```
